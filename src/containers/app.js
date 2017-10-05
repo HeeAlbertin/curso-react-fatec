@@ -1,71 +1,57 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux' //dispatch = um dos metodos do store -> dispara uma action
+
+import * as loaderActionCreators from '../actions/loader'
+
 import Header from '../components/header'
 
 import API from '../api.js'
 import Loader from '../components/loader'
 import RecipesList from '../components/recipes-list'
 
-const ENTER_CHAR_CODE = 13
+const actionCreators = {
+  ...loaderActionCreators //os ... pega cada fetch do array, pois aqui recebe os dois objetos (display e hide)
+}
 
 class App extends Component {
-  constructor () {
-    super();
+  /* INICIALIZAÇÃO DOS COMPONENTES NA MÃO, APENAS PARA TESTE
+  //cada escopo tem seu this
+  componentDidMount() {
+    this.props.displayLoader()
 
-    this.state = { 
-      isFetching: false,
-      recipes: []
-    }
-
-    this.fetchRecipes = this.fetchRecipes.bind(this)
-    this.onSearchRecipes = this.onSearchRecipes.bind(this)
-    this.onFetchRecipesSuccess = this.onFetchRecipesSuccess.bind(this)
-  }
-
-  fetchRecipes (ingredientList) {
-    
-    const params = { i: ingredientList }
-    this.setState({ isFetching: true })
-
-    API.get('/', { params })
-      .then(this.onFetchRecipesSuccess)
-      .catch(this.onFetchRecipesFailure)
-      .then(() => {
-        this.setState({ isFetching: false })
-      })
-  }
-
-  onFetchRecipesSuccess (response) {
-    console.log(response);
-    this.setState({ recipes: response.data.results })
-  }
-
-  onFetchRecipesFailure (err) {
-    console.error(err.message, err)
-    alert('Deu Ruim!')  
-  }
-
-  onSearchRecipes (event) {
-    if (event.charCode !== ENTER_CHAR_CODE) {
-      return
-    }
-
-    this.fetchRecipes(event.target.value)
-  }
+    setTimeout(() => {
+      this.props.hideLoader()
+    }, 2000)
+  }  */
 
   render() {
+    const { props } = this //apenas gracinha do ES6 que é igual a:
+    /*
+    const props = this.props // destroi e constroi novamente
+    // com isso não é necessário dar um this. em todas as chamadas de props
+    */
+
     return (
       <div className="container">
-        <Header onSearchRecipes={ (this.onSearchRecipes) }/>
+        <Header />
 
-        { this.state.isFetching && <Loader /> }
-
-        {
-          !this.state.isFetching &&
-          <RecipesList recipes={ this.state.recipes } />
-        }
+        { props.isFetching && <Loader /> }
       </div>
     )
   }
 }
 
-export default App
+const mapStateToProps = (state) => {
+  return {
+    isFetching: state.loader 
+  }
+}
+
+// funcao que recebe o dispatch
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(actionCreators, dispatch)
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App) // chama duas vezes, na segunda chamada passa o App
+  //connect recebe dois argumentos. Primeiro é o que mapeia o estado da store e o segundo parametro é o dispatch
