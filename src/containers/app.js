@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux' //dispatch = um dos metodos do store -> dispara uma action
 
 import * as loaderActionCreators from '../actions/loader'
+import * as recipesActionCreators from '../actions/recipes'
 
 import Header from '../components/header'
 
@@ -11,7 +12,8 @@ import Loader from '../components/loader'
 import RecipesList from '../components/recipes-list'
 
 const actionCreators = {
-  ...loaderActionCreators //os ... pega cada fetch do array, pois aqui recebe os dois objetos (display e hide)
+  ...loaderActionCreators, //os ... pega cada fetch do array, pois aqui recebe os dois objetos (display e hide)
+  ...recipesActionCreators
 }
 
 class App extends Component {
@@ -25,6 +27,7 @@ class App extends Component {
     }, 2000)
   }  */
 
+
   render() {
     const { props } = this //apenas gracinha do ES6 que é igual a:
     /*
@@ -34,9 +37,14 @@ class App extends Component {
 
     return (
       <div className="container">
-        <Header />
+        <Header onSearchRecipes={ props.fetchRecipes }/>
 
         { props.isFetching && <Loader /> }
+
+        { 
+          !!props.recipes.length &&//nega duas vezes para transformar em boolean
+          <RecipesList recipes={ props.recipes } />
+        }
       </div>
     )
   }
@@ -44,7 +52,8 @@ class App extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    isFetching: state.loader 
+    isFetching: state.loader,
+    recipes: state.recipes
   }
 }
 

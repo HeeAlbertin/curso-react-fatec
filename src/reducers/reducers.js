@@ -4,9 +4,11 @@
 import { combineReducers } from 'redux'
 
 import loader from './loader'
+import recipes from './recipes'
 
 const appReducers = combineReducers({ 
-	loader //{ loader } === { loader: loader }, é a mesma coisa
+	loader, //{ loader } === { loader: loader }, é a mesma coisa
+	recipes
 })
 
 export default appReducers
